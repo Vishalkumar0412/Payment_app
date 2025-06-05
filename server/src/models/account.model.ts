@@ -20,6 +20,7 @@ const AccountSchema = new mongoose.Schema<IAccount>({
         type: String,
         enum: ['savings', 'current'],
         required: true,
+        default: 'savings',
     }
 }, { timestamps: true });
 const Account = mongoose.model<IAccount>('Account', AccountSchema);

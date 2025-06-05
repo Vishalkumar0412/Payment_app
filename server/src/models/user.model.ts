@@ -1,4 +1,5 @@
 // File: server/src/models/user.model.ts
+import { randomUUID } from "crypto";
 import mongoose from "mongoose";
 
 interface IUser extends mongoose.Document {
@@ -49,11 +50,12 @@ const UserSchema  = new mongoose.Schema <IUser>({
     account: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Account',
-        required: true,
+        
     },
     mobile:{
         type:String,
-        unique:true
+        unique:true,
+        required:true
     }
    
     
