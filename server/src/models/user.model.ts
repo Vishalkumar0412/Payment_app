@@ -1,5 +1,5 @@
 // File: server/src/models/user.model.ts
-import { randomUUID } from "crypto";
+
 import mongoose from "mongoose";
 
 interface IUser extends mongoose.Document {
@@ -10,10 +10,9 @@ interface IUser extends mongoose.Document {
     lastName: string;
     role: 'user' | 'admin';
     transactions?: mongoose.Types.ObjectId[];
-    account:mongoose.Types.ObjectId;
+    account?:mongoose.Types.ObjectId;
     mobile?: string;
-    createdAt?: Date;
-    updatedAt?: Date;
+ 
 }
 const UserSchema  = new mongoose.Schema <IUser>({
     username: {
@@ -45,7 +44,8 @@ const UserSchema  = new mongoose.Schema <IUser>({
     },
     transactions: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Transaction'
+        ref: 'Transaction',
+        
     }],
     account: {
         type: mongoose.Schema.Types.ObjectId,

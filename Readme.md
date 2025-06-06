@@ -2,4 +2,4 @@
 
 You can view the full API documentation in Postman:
 
-👉 [View Postman Docs](https://documenter.getpostman.com/view/12345678/2s93zxyz1A)
+👉 [View Postman Docs](https://documenter.getpostman.com/view/42374935/2sB2x2KZrS)

@@ -4,7 +4,8 @@ import User from "../models/user.model";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/genrateToken";
 import Account from "../models/account.model";
-
+import Transaction from "../models/transaction.model";
+import mongoose from "mongoose";
 export const signup = async (req: express.Request, res: express.Response) => {
   try {
     const parsedData = signupSchema.safeParse(req.body);
@@ -52,6 +53,8 @@ export const signup = async (req: express.Request, res: express.Response) => {
     const newAccount = await Account.create({
       userId: newUser._id,
     });
+    newUser.account = newAccount._id as typeof newUser.account;
+    await newUser.save();
 
     generateToken(res, newUser, "Signup successful");
   } catch (error) {
@@ -104,6 +107,53 @@ export const signin = async (req: express.Request, res: express.Response) => {
     generateToken(res, user, "Signin successful");
   } catch (error) {
     console.error("Signin error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const signout =async(req:express.Request,res:express.Response)=>{
+  try {
+    res.clearCookie("token");
+    return res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+}
+
+export const getProfile = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const userId = (req as any).user.userId; // Extract userId from the request object
+    const user = await User.findOne({ _id: userId }).select('-password').populate({
+      path: "account",
+      populate: {
+        path: "transactions",
+        model:"Transaction"
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      user,
+    });
+    console.log("Registered models:", mongoose.modelNames());
+
+  } catch (error) {
+    console.error("Get profile error:", error);
+    console.log("Registered models:", mongoose.modelNames());
+
     return res.status(500).json({ message: "Something went wrong" });
   }
 };

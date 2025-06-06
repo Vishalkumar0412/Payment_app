@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv'
 import { db } from './database/db';
 import rootRouter from './routes/index';
+import './models'
 dotenv.config();
 import cookieParser from 'cookie-parser';
 

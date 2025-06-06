@@ -1,10 +1,10 @@
 import mongoose, { Document } from "mongoose";
 interface IAccount extends Document {
     userId: mongoose.Types.ObjectId;
-    balance: number;
+    balance?: number;
+    transactions?: mongoose.Types.ObjectId[];
     accountType: 'savings' | 'current';
-    createdAt?: Date;
-    updatedAt?: Date;
+    
 }
 const AccountSchema = new mongoose.Schema<IAccount>({
     userId: {
@@ -21,7 +21,12 @@ const AccountSchema = new mongoose.Schema<IAccount>({
         enum: ['savings', 'current'],
         required: true,
         default: 'savings',
-    }
+    },
+    transactions: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Transaction',
+    }],
+
 }, { timestamps: true });
 const Account = mongoose.model<IAccount>('Account', AccountSchema);
 export default Account;
