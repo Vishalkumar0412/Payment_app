@@ -14,7 +14,7 @@ const AccountSchema = new mongoose.Schema<IAccount>({
     },
     balance: {
         type: Number,
-        default: 0,
+        default: 1000,
     },
     accountType: {
         type: String,

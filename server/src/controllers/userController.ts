@@ -24,7 +24,7 @@ export const signup = async (req: express.Request, res: express.Response) => {
     const { username, email, password, firstName, lastName, mobile } =
       parsedData.data;
     const existUser = await User.findOne({
-      $or: [{ username }, { email }, { mobile }],
+      $or: [{ username }, { email : email.toLowerCase() }, { mobile }],
     });
     if (existUser) {
       return res.status(400).json({
@@ -32,14 +32,14 @@ export const signup = async (req: express.Request, res: express.Response) => {
         message: "User with this username, email or mobile already exists",
       });
     }
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password.trim(), 10);
 
     const newUser = await User.create({
-      username,
-      email,
+      username:username.toLowerCase().trim(),
+      email:email.toLowerCase(),
       firstName,
       lastName,
-      mobile,
+      mobile:mobile.trim(),
       password: passwordHash,
     });
 
@@ -63,31 +63,37 @@ export const signup = async (req: express.Request, res: express.Response) => {
   }
 };
 
-export const signin = async (req: express.Request, res: express.Response) => {
+
+
+
+
+export const signin = async (req: Request, res: Response) => {
   try {
+    // Validate using Zod
     const parsedData = signinSchema.safeParse(req.body);
     if (!parsedData.success) {
-      const errors = parsedData.error.errors.map((error) => ({
-        path: error.path.join("."),
-        message: error.message,
+      const errors = parsedData.error.errors.map((err) => ({
+        path: err.path.join("."),
+        message: err.message,
       }));
-
       return res.status(400).json({
         success: false,
         errors,
       });
     }
-    const { email, password } = parsedData.data;
-    // Validate email and password presence
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password are required",
-      });
-    }
 
-    const user = await User.findOne({ email }).populate("account");
+    // Destructure and trim data
+    const { method, identifier, password } = parsedData.data;
+    const cleanIdentifier = identifier.trim();
+    const cleanPassword = password.trim();
 
+    let query: Record<string, string> = {};
+    if (method === "username") query.username = cleanIdentifier.toLowerCase();
+    else if (method === "email") query.email = cleanIdentifier.toLowerCase();
+    else if (method === "mobile") query.mobile = cleanIdentifier;
+
+    // Find user
+    const user = await User.findOne(query).populate("account");
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -95,23 +101,29 @@ export const signin = async (req: express.Request, res: express.Response) => {
       });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
+    // Validate password
+    const isPasswordValid = await bcrypt.compare(cleanPassword, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        message: "Invalid credentials",
+        message: "Invalid password, email ,username ,or mobile",
       });
     }
 
+    // Send token + success
     generateToken(res, user, "Signin successful");
   } catch (error) {
     console.error("Signin error:", error);
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 
-export const signout =async(req:express.Request,res:express.Response)=>{
+
+
+export const signout = async (req: express.Request, res: express.Response) => {
   try {
     res.clearCookie("token");
     return res.status(200).json({
@@ -122,7 +134,7 @@ export const signout =async(req:express.Request,res:express.Response)=>{
     console.error("Logout error:", error);
     return res.status(500).json({ message: "Something went wrong" });
   }
-}
+};
 
 export const getProfile = async (
   req: express.Request,
@@ -130,13 +142,15 @@ export const getProfile = async (
 ) => {
   try {
     const userId = (req as any).user.userId; // Extract userId from the request object
-    const user = await User.findOne({ _id: userId }).select('-password').populate({
-      path: "account",
-      populate: {
-        path: "transactions",
-        model:"Transaction"
-      },
-    });
+    const user = await User.findOne({ _id: userId })
+      .select("-password")
+      .populate({
+        path: "account",
+        populate: {
+          path: "transactions",
+          model: "Transaction",
+        },
+      });
 
     if (!user) {
       return res.status(404).json({
@@ -149,11 +163,45 @@ export const getProfile = async (
       user,
     });
     console.log("Registered models:", mongoose.modelNames());
-
   } catch (error) {
     console.error("Get profile error:", error);
     console.log("Registered models:", mongoose.modelNames());
 
     return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const filterUser = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const filter = req.query.filter as string|| "";
+    console.log(filter);
+    
+     const filteredUsers = await User.find({
+      $or: [
+        { firstName: { $regex: filter, $options: "i" } },
+        { lastName: { $regex: filter, $options: "i" } },
+        { mobile: { $regex: filter, $options: "i" } },
+      ],
+    });
+
+    return res.status(200).json(
+      {
+        users: filteredUsers.map((user)=>({
+          username:user.username,
+          firstName:user.firstName,
+          lastName:user.lastName,
+          mobile:user.mobile
+        })),
+        success:true
+      }
+    )
+  } catch (error) {
+    return res.status(500).json({
+      success:false,
+      message:"something went wrong"
+    })
   }
 };
