@@ -12,23 +12,19 @@ interface ITransaction extends mongoose.Document {
 const TransactionSchema = new mongoose.Schema<ITransaction>({
     from: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Account',
         required: true,
     },
     to: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Account',
         required: true,
     },
     amount: {
         type: Number,
         required: true,
     },
-    type: {
-        type: String,
-        enum: ['credit', 'debit'],
-        required: true,
-    },
+    
     description: {
         type: String,
         default: '',
@@ -38,6 +34,6 @@ const TransactionSchema = new mongoose.Schema<ITransaction>({
         enum: ['pending', 'completed', 'failed'],
         default: 'pending',
     }
-});
+},{timestamps:true});
 const Transaction = mongoose.model<ITransaction>('Transaction', TransactionSchema);
 export default Transaction;

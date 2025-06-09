@@ -1,5 +1,5 @@
 import express from 'express';
-import { filterUser, getProfile, signin, signout, signup } from '../controllers/userController';
+import { filterUser, getProfile, getUserByAccount, signin, signout, signup } from '../controllers/userController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
 
@@ -13,5 +13,6 @@ router.post('/signin',signin)
 router.get('/',authMiddleware,getProfile)
 router.post('/signout', signout);
 router.get('/bulk',authMiddleware,filterUser)
+router.get('/get-user',authMiddleware,getUserByAccount)
 
 export default router;

@@ -29,8 +29,10 @@ export const checkBalance=async(req:express.Request,res:express.Response)=>{
 
 export const getAccountDetails = async (req: express.Request, res: express.Response) => {
     try {
-        const userId = req.user.userId; // Assuming user is set by authMiddleware
-        const account = await Account.findOne({ userId }).populate('transactions');
+        const userId = req.user.userId; 
+          const account = await Account.findOne({ userId:req.user.userId }).select("-transactions -__v")
+        
+
         
         if (!account) {
             return res.status(404).json({

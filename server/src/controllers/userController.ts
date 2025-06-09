@@ -6,6 +6,8 @@ import { generateToken } from "../utils/genrateToken";
 import Account from "../models/account.model";
 import Transaction from "../models/transaction.model";
 import mongoose from "mongoose";
+import { log } from "node:console";
+import { loadavg } from "node:os";
 export const signup = async (req: express.Request, res: express.Response) => {
   try {
     const parsedData = signupSchema.safeParse(req.body);
@@ -185,16 +187,11 @@ export const filterUser = async (
         { lastName: { $regex: filter, $options: "i" } },
         { mobile: { $regex: filter, $options: "i" } },
       ],
-    });
+    }).select('-password -role -transactions');
 
     return res.status(200).json(
       {
-        users: filteredUsers.map((user)=>({
-          username:user.username,
-          firstName:user.firstName,
-          lastName:user.lastName,
-          mobile:user.mobile
-        })),
+        users: filteredUsers.map((user)=>(user)),
         success:true
       }
     )
@@ -205,3 +202,29 @@ export const filterUser = async (
     })
   }
 };
+
+export const getUserByAccount=async(req,res)=>{
+
+  const accountId=req.query.accountId;
+  if(!accountId){
+    return res.status(400).json({
+      success:false,
+      message:"Account is not found"
+    })
+
+  }
+  const userId=await Account.findOne({_id:accountId}).populate('userId','-password').select('userId')
+  if(!userId){
+    return res.status(400).json({
+      success:false,
+      message:'User not found'
+    })
+  }
+  console.log(userId);
+  
+  const user=userId?.userId;
+
+
+  return res.status(200).json({user});
+
+}
