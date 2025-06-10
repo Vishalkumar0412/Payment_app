@@ -1,0 +1,143 @@
+
+
+const transactions = [
+  {
+    _id: "684820d6075708b357a68631",
+    from: {
+      userId: {
+        _id: "68481e7d075708b357a68607",
+        email: "vishal@gmai.com",
+        firstName: "vishal",
+        lastName: "nigam"
+      }
+    },
+    to: {
+      userId: {
+        _id: "6846c781330972436c98735f",
+        email: "vishal@gmail.com",
+        firstName: "ajay",
+        lastName: "kumar"
+      }
+    },
+    amount: 100,
+    status: "completed",
+    createdAt: "2025-06-10T12:11:02.720Z"
+  },
+  {
+    _id: "684820d3075708b357a68621",
+    from: {
+      userId: {
+        _id: "6846c781330972436c98735f",
+        email: "vishal@gmail.com",
+        firstName: "vishal",
+        lastName: "kumar"
+      }
+    },
+    to: {
+      userId: {
+        _id: "68481e7d075708b357a68607",
+        email: "vishal@gmai.com",
+        firstName: "vishal",
+        lastName: "nigam"
+      }
+    },
+    amount: 150,
+    status: "completed",
+    createdAt: "2025-06-10T12:10:59.408Z"
+  }
+]
+
+// const TransactionDetails = () => {
+
+
+//   if (!txn) return <div>Transaction not found</div>
+
+//   return (
+//     <div className="p-4">
+//       <h2 className="text-xl font-bold">Transaction Details</h2>
+//       <p><strong>Type:</strong> {txn.from.userId._id === "68481e7d075708b357a68607" ? "debit" : "credit"}</p>
+//       <p><strong>Amount:</strong> ₹{txn.amount}</p>
+//       <p><strong>Status:</strong> {txn.status}</p>
+//       <p><strong>Date:</strong> {new Date(txn.createdAt).toLocaleString()}</p>
+//       <p><strong>From:</strong> {txn.from.userId.firstName} {txn.from.userId.lastName}</p>
+//       <p><strong>To:</strong> {txn.to.userId.firstName} {txn.to.userId.lastName}</p>
+//     </div>
+//   )
+// }
+
+// export default TransactionDetails
+
+import React from "react";
+import { motion } from "framer-motion";
+import { currency } from "@/utills/constaints";
+import { useParams } from "react-router";
+
+const TransactionDetails = () => {
+      const { id } = useParams()
+
+  const txn = transactions.find((t) => t._id === id)
+    const user = {
+        username: "vishal11",
+        email: "vishal@gmail1111.com",
+        firstName: "vishal",
+        lastName: "nigam",
+        password: "7906adasfa",
+        mobile: "7906338791",
+    };
+    const account = {
+        id: "6847a441075708b357a685fc",
+        userId: "6847a441075708b357a685fa",
+        balance: 1000.056,
+        accountType: "savings",
+        createdAt: "2025-06-10T03:19:29.207Z",
+        updatedAt: "2025-06-10T03:19:29.207Z",
+    };
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-white to-blue-100 flex items-center justify-center py-20 px-4">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.98, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white rounded-2xl shadow-xl border border-gray-100 min-h-[80vh] w-full p-8"
+            >
+                <motion.h1
+                    initial={{ opacity: 0, x: -40 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="text-2xl font-extrabold bg-gradient-to-br from-blue-900 to-blue-600 bg-clip-text text-transparent mb-2"
+                >
+                    ZapPay
+                </motion.h1>
+                <div className="mb-6">
+            
+                    <div className="text-4xl font-bold bg-gradient-to-br to-blue-900 from-blue-600 bg-clip-text text-transparent">
+                       Transaction Details
+                    </div>
+                </div>
+                <hr className="my-8" />
+                <div className="md:mx-10 grid grid-cols-2 gap-x-4 gap-y-3 md:text-lg text-sm border border-gray-600 px-5 py-5 border-dashed">
+                    <div className="text-gray-500">Type:</div>
+                    <div className="font-medium capitalize">{txn.from.userId._id === "68481e7d075708b357a68607" ? "debit" : "credit"}</div>
+                    <div className="text-gray-500">Transaction Id: </div>
+                    <div className="font-mono text-xs break-all">{txn._id}</div>
+                    <div className="text-gray-500">Amount:</div>
+                    <div className="font-medium">
+                        {currency.format(txn.amount)} 
+                    </div>
+                    <div className="text-gray-500">Status:</div>
+                    <div className="font-medium break-all">{txn.status}</div>
+                    <div className="text-gray-500">Date:</div>
+                    <div className="font-medium">{new Date(txn.createdAt).toLocaleString()}</div>
+                    <div className="text-gray-500">From:</div>
+                    <div className="font-medium">{txn.from.userId.firstName} {txn.from.userId.lastName}</div>
+                    <div className="text-gray-500">To:</div>
+                    <div className="font-medium">{txn.to.userId.firstName} {txn.to.userId.lastName}</div>
+                </div>
+            </motion.div>
+        </div>
+    );
+};
+
+export default TransactionDetails;
+
