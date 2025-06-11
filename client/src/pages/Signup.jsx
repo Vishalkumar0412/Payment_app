@@ -1,17 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { useState } from "react";
-import { Link } from "react-router";
-import {motion} from 'motion/react'
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { motion } from "motion/react";
+import { signupSchema } from "@/zod/userZod";
+import { useSignupUserMutation } from "@/services/api/authApi";
+import { toast } from "sonner";
 
 const Signup = () => {
-  const errors =null
-  //  {
-  //   username: "Enter correct Username",
-  //   password: "Enter password min 6 digit",
-  //   mobile: "mobile number must be 10 digit",
-  // };
+  const navigate=useNavigate()
+  const [errors, setErrors] = useState();
+  const [signupUser, { data, isLoading, isSuccess, error }] =
+    useSignupUserMutation();
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -21,51 +23,113 @@ const Signup = () => {
     mobile: "",
   });
 
+  const handleOnChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const parsed = signupSchema.safeParse(formData);
+    if (!parsed.success) {
+      setErrors(parsed.error.flatten().fieldErrors);
+    } else {
+      setErrors(null);
+      signupUser(parsed.data);
+    }
+  };
+
+
+ 
+  useEffect(() => {
+    if (data && isSuccess) {
+      toast.success(data.message || "Signup Successful.")
+    navigate('/account')
+    }
+    if(error){
+      toast.error(data.data.message ||"Signup Failed")
+    }
+
+
+
+
+  }, [isLoading, error, data]);
+
   return (
     <div className="min-h-screen w-full flex justify-center items-center bg-gradient-to-br from-white to-zinc-200">
-      <motion.div
-      initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 1,
-            staggerChildren: 0.4,
-          }}
-      className="bg-white px-5 py-5 flex flex-col  shadow-2xl border border-gray-300 gap-4">
+      <motion.div className="bg-white px-5 py-5 flex flex-col  shadow-2xl border border-gray-300 gap-4">
         <div className="flex justify-center items-center">
           <h2 className="text-center text-3xl font-bold">
             Create your account{" "}
           </h2>
         </div>
         <div className="flex flex-col px-10 py-5 border border-gray-200 gap-5">
-          <form action="" className="flex flex-col gap-5">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className="flex gap-4">
               <div className=" flex flex-col gap-2">
                 <Label htmlFor="fname">First Name</Label>
-                <Input id="fname" placeholder="First Name"/>
+                <Input
+                  id="fname"
+                  placeholder="First Name"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleOnChange}
+                />
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="lname">Last Name</Label>
-                <Input id="lname" placeholder="Last Name"/>
+                <Input
+                  id="lname"
+                  placeholder="Last Name"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleOnChange}
+                />
               </div>
             </div>
             <div className="flex gap-4">
               <div className=" flex flex-col gap-2">
                 <Label htmlFor="username">Username</Label>
-                <Input id="username" placeholder="Username"/>
+                <Input
+                  id="username"
+                  placeholder="Username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleOnChange}
+                />
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="mobile">Mobile Number</Label>
-                <Input id="mobile" placeholder="Mobile Number"/>
+                <Input
+                  id="mobile"
+                  placeholder="Mobile Number"
+                  name="mobile"
+                  value={formData.mobile}
+                  onChange={handleOnChange}
+                />
               </div>
             </div>
             <div className="flex gap-4">
               <div className=" flex flex-col gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type='email' placeholder="Email"/>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleOnChange}
+                />
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type='password' placeholder="Password"/>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleOnChange}
+                />
               </div>
             </div>
             {errors && (
@@ -78,13 +142,18 @@ const Signup = () => {
               </p>
             )}
             <div className="flex justify-center items-center">
-              <Button type="submit" className="flex-1 cursor-pointer">Sign Up</Button>
+              <Button type="submit" className="flex-1 cursor-pointer">
+                Sign Up
+              </Button>
             </div>
           </form>
-              <p className="text-center text-blue-800">Already have an account ? <Link className="font-bold" to="/login">Login</Link></p>
+          <p className="text-center text-blue-800">
+            Already have an account ?{" "}
+            <Link className="font-bold" to="/login">
+              Login
+            </Link>
+          </p>
         </div>
-        
-       
       </motion.div>
     </div>
   );

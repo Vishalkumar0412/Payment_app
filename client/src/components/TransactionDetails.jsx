@@ -70,7 +70,8 @@ const transactions = [
 import React from "react";
 import { motion } from "framer-motion";
 import { currency } from "@/utills/constaints";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
+import { ArrowLeft, MoveLeft } from "lucide-react";
 
 const TransactionDetails = () => {
       const { id } = useParams()
@@ -105,18 +106,19 @@ const TransactionDetails = () => {
                     initial={{ opacity: 0, x: -40 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="text-2xl font-extrabold bg-gradient-to-br from-blue-900 to-blue-600 bg-clip-text text-transparent mb-2"
+                    className="text-2xl font-extrabold bg-gradient-to-br from-blue-900 to-blue-600 bg-clip-text text-transparent md:mb-2"
                 >
                     ZapPay
                 </motion.h1>
                 <div className="mb-6">
             
-                    <div className="text-4xl font-bold bg-gradient-to-br to-blue-900 from-blue-600 bg-clip-text text-transparent">
-                       Transaction Details
-                    </div>
+                    <h1 className="md:text-4xl text-2xl font-bold bg-gradient-to-br to-blue-900 from-blue-600 bg-clip-text text-transparent">
+                     Transaction Details 
+                    </h1>
                 </div>
-                <hr className="my-8" />
-                <div className="md:mx-10 grid grid-cols-2 gap-x-4 gap-y-3 md:text-lg text-sm border border-gray-600 px-5 py-5 border-dashed">
+                <hr className="my-5" />
+                <Link to='/transactions' className="flex text-blue-700 items-center gap-1 px-2 py-1"><ArrowLeft className="text-blue-800 ml-5" /> Back</Link>
+                <div className="my-2 md:mx-10 grid grid-cols-2 gap-x-4 gap-y-3 md:text-lg text-sm border border-gray-600 px-5 py-5 border-dashed">
                     <div className="text-gray-500">Type:</div>
                     <div className="font-medium capitalize">{txn.from.userId._id === "68481e7d075708b357a68607" ? "debit" : "credit"}</div>
                     <div className="text-gray-500">Transaction Id: </div>

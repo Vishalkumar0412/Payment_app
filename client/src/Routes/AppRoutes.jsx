@@ -8,6 +8,9 @@ import Account from "../pages/Account";
 import Users from "@/pages/Users";
 import Transactions from "@/pages/Transactions";
 import TransactionDetails from "@/components/TransactionDetails";
+import SendMoney from "@/components/SendMoey";
+import TransactionReceipt from "@/components/TransactionReciept";
+import { AuthonticatedUser, ProtectedRoute } from "./ProtectedRoute";
 
 const appRouter = createBrowserRouter([
   {
@@ -20,31 +23,44 @@ const appRouter = createBrowserRouter([
       },
       {
         path: "Signup",
-        element: <Signup />,
+        element: (
+        <AuthonticatedUser>
+        <Signup />
+        </AuthonticatedUser>),
       },
       {
         path: "login",
-        element: <Login />,
+        element:( 
+      <AuthonticatedUser>
+          <Login />
+          </AuthonticatedUser>
+      
+      ),
       },
       {
         path:'*',
         element:<Nopage/>
       },{
         path:'account',
-        element:<Account/>
+        element:(<ProtectedRoute><Account/></ProtectedRoute>)
       },
       {
         path:'transfer',
-        element:<Users/>
+        element:(<ProtectedRoute><Users/></ProtectedRoute>)
+      },
+      {
+        path:'send-money/:id',
+        element:(<ProtectedRoute><SendMoney/></ProtectedRoute>)
       },
       {
         path:'transactions',
-        element:<Transactions/>
+        element:(<ProtectedRoute><Transactions/></ProtectedRoute>)
       },
       {
         path:'transaction/:id',
-        element:<TransactionDetails/>
-      }
+        element:<ProtectedRoute><TransactionReceipt/></ProtectedRoute>
+      },
+    
     ],
   },
 ]);

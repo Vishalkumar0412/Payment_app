@@ -182,6 +182,7 @@ export const filterUser = async (
     console.log(filter);
     
      const filteredUsers = await User.find({
+      _id: { $ne: req.user.userId },
       $or: [
         { firstName: { $regex: filter, $options: "i" } },
         { lastName: { $regex: filter, $options: "i" } },
@@ -189,6 +190,7 @@ export const filterUser = async (
       ],
     }).select('-password -role -transactions');
 
+    
     return res.status(200).json(
       {
         users: filteredUsers.map((user)=>(user)),

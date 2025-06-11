@@ -1,29 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { motion } from "framer-motion";
 import { ArrowRightLeft, BookUserIcon, LogIn, LogOut, Send, SquareUserRound, User } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useSelector } from "react-redux";
+import { useLogoutUserMutation } from "@/services/api/authApi";
+import { toast } from "sonner";
 const Navbar = () => {
-  const user =
-  {
-    username: "vishal11",
-    email: "vishal@gmail1111.com",
-    firstName: "vishal",
-    lastName: "nigam",
-    password: "7906adasfa",
-    mobile: "7906338791",
-  };
 
+  const {user}=useSelector((store)=>store.auth)
+  const [logoutUser,{data,isSuccess}]=useLogoutUserMutation()
+  const navigate=useNavigate()
   const [isScrolled, setIsScrolled] = React.useState(false);
+  const logoutHandler=async ()=>{
+    await logoutUser();
+  }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(()=>{
+    if(isSuccess){
+      toast.success(data?.message ||"Logout successfully")
+      navigate('/login')
+    }
+  },[isSuccess])
 
   return (
     <motion.div
@@ -51,7 +58,7 @@ const Navbar = () => {
         </motion.h1></Link>
       </div>
 
-      <div className="w-60 flex justify-center">
+      <div className=" flex justify-center">
         {user ? (
           <div>
             <DropdownMenu>
@@ -75,7 +82,8 @@ const Navbar = () => {
                 <DropdownMenuItem><Send /> Send Money</DropdownMenuItem>
                 </Link>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem><LogOut/>Logout</DropdownMenuItem>
+
+                <DropdownMenuItem onClick={logoutHandler}> <LogOut/>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -83,6 +91,8 @@ const Navbar = () => {
           <Button
             variant="link"
             className="text-xl font-bold font-display text-blue-700"
+            onClick={()=>navigate('/login')}
+
           >
             Login <LogIn/>
           </Button>

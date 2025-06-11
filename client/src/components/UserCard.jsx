@@ -2,6 +2,7 @@ import React from "react";
 import AvtarByName from "./AvtarByName";
 import { Button } from "./ui/button";
 import { BookUser, Send } from "lucide-react";
+import { Link } from "react-router";
 
 const UserCard = ({user}) => {
    
@@ -17,8 +18,9 @@ const UserCard = ({user}) => {
             </div>
             <div className="flex items-center gap-2">
                 <Button variant="secondary" className='text-md hidden md:flex '> Contact <BookUser /></Button>
+                <Link to={`/send-money/${user._id}`}>
                 <Button className='text-md cursor-pointer'> Send <Send/></Button>
-
+                </Link>
             </div>
   </div>
   
