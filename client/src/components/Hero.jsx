@@ -24,7 +24,7 @@ const Hero = () => {
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{
-            duration: 0.5,
+            duration: 0.3,
             staggerChildren: 0.1,
           }}
           className="md:text-6xl text-5xl md:mb-8 mb-2 font-bold bg-gradient-to-br from-blue-900 to-blue-600 bg-clip-text text-transparent"
@@ -38,7 +38,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
-            duration: 0.5,
+            duration: 0.3,
             staggerChildren: 0.1,
           }}
         >

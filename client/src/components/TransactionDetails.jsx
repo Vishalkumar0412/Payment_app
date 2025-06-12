@@ -77,23 +77,7 @@ const TransactionDetails = () => {
       const { id } = useParams()
 
   const txn = transactions.find((t) => t._id === id)
-    const user = {
-        username: "vishal11",
-        email: "vishal@gmail1111.com",
-        firstName: "vishal",
-        lastName: "nigam",
-        password: "7906adasfa",
-        mobile: "7906338791",
-    };
-    const account = {
-        id: "6847a441075708b357a685fc",
-        userId: "6847a441075708b357a685fa",
-        balance: 1000.056,
-        accountType: "savings",
-        createdAt: "2025-06-10T03:19:29.207Z",
-        updatedAt: "2025-06-10T03:19:29.207Z",
-    };
-
+   
     return (
         <div className="min-h-screen bg-gradient-to-br from-white to-blue-100 flex items-center justify-center py-20 px-4">
             <motion.div

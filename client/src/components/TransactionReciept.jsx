@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { currency } from "@/utills/constaints";
 
 import { useFetchTxnQuery } from "@/services/api/txnApi";
+import Loading from "./Loading";
 
 const TransactionReceipt = () => {
+    
   const { id } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, error } = useFetchTxnQuery(id);
@@ -50,9 +52,7 @@ To:
 
   if (isLoading)
     return (
-      <div className="h-screen flex items-center justify-center text-blue-500">
-        Loading...
-      </div>
+      <Loading/>
     );
 
   if (error || !txn)

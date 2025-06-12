@@ -12,6 +12,7 @@ import { currency } from "@/utills/constaints";
 import { useNavigate } from "react-router";
 import { useGetHistoryQuery } from "@/services/api/txnApi";
 import { useLoadUserQuery } from "@/services/api/authApi";
+import Loading from "./Loading";
 
 const formatDateTime = (isoString) => {
   const date = new Date(isoString);
@@ -44,7 +45,10 @@ const TransactionTable = () => {
       setTransactions(sortedTransactions);
     }
   }, [isSuccess, userIsSuccess, data, userData]);
-
+  if(isLoading)
+{
+  return <Loading/>
+}
   return (
     <Table className="overflow-auto">
       <TableCaption>Your recent transactions.</TableCaption>

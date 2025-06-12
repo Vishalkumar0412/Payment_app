@@ -9,6 +9,7 @@ import { currency } from "@/utills/constaints";
 import UserCard from "@/components/UserCard";
 import { useGetFilteredUsersQuery } from "@/services/api/authApi";
 import { useSendMoneyMutation } from "@/services/api/txnApi";
+import Loading from "./Loading";
 
 const SendMoney = () => {
   const { id } = useParams(); // user ID from route
@@ -35,6 +36,7 @@ const SendMoney = () => {
     }
 
   },[isSuccess,error,isLoading])
+  if(isLoading) return <Loading/>
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-blue-100 flex items-center justify-center py-16 px-4">
