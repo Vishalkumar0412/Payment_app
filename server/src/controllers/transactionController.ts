@@ -3,11 +3,40 @@ import mongoose from "mongoose";
 import Account from "../models/account.model";
 import Transaction from "../models/transaction.model";
 
+// fetch trabsaction
+const getUserTransactionsQuery = async (
+  accountId: mongoose.Types.ObjectId,
+  options?: { skip?: number; limit?: number }
+) => {
+  const { skip = 0, limit = 0 } = options || {};
+
+  return Transaction.find({
+    $or: [{ from: accountId }, { to: accountId }],
+  })
+    .populate({
+      path: "from",
+      populate: {
+        path: "userId",
+        select: "firstName lastName email mobile",
+      },
+    })
+    .populate({
+      path: "to",
+      populate: {
+        path: "userId",
+        select: "firstName lastName email mobile",
+      },
+    })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+};
+
 export const transferFund = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
- let transactionId: mongoose.Types.ObjectId | null = null;
+  let transactionId: mongoose.Types.ObjectId | null = null;
 
   try {
     const userId = req.user.userId;
@@ -62,7 +91,7 @@ export const transferFund = async (req: Request, res: Response) => {
       ],
       { session }
     );
-    
+
     transactionId = transaction[0]._id;
 
     // ✅ Deduct from sender
@@ -76,7 +105,6 @@ export const transferFund = async (req: Request, res: Response) => {
       { $inc: { balance: amount } }
     ).session(session);
 
-     
     // ✅ Create transaction record
     await Transaction.updateOne(
       { _id: transaction[0]._id },
@@ -89,29 +117,27 @@ export const transferFund = async (req: Request, res: Response) => {
     return res
       .status(200)
       .json({ message: "Transfer successful", transaction: transaction[0] });
+  } catch (error: any) {
+    await session.abortTransaction();
+    session.endSession();
+
+    let transaction = null; // Declare here
+
+    if (transactionId) {
+      transaction = await Transaction.findOneAndUpdate(
+        { _id: transactionId },
+        { status: "failed" },
+        { new: true }
+      );
+    }
+
+    return res.status(500).json({
+      transaction, // Use here safely
+      message: "Transfer failed",
+      error: error.message,
+    });
   }
-  catch (error: any) {
-  await session.abortTransaction();
-  session.endSession();
-
-  let transaction = null;  // Declare here
-
-  if (transactionId) {
-    transaction = await Transaction.findOneAndUpdate(
-      { _id: transactionId },
-      { status: "failed" },
-      { new: true }
-    );
-  }
-
-  return res.status(500).json({
-    transaction,          // Use here safely
-    message: "Transfer failed",
-    error: error.message,
-  });
-}
-
-}
+};
 
 export const getHistory = async (req: Request, res: Response) => {
   const userId = req.user.userId;
@@ -129,28 +155,7 @@ export const getHistory = async (req: Request, res: Response) => {
 
     const accountId = account._id.toString(); // Convert to string for consistency
 
-    const transactions = await Transaction.find({
-      $or: [{ from: accountId }, { to: accountId }],
-    })
-      .populate({
-        path: "from",
-        select: "userId",
-        populate: {
-          path: "userId",
-          model: "User",
-          select: "firstName lastName email mobile",
-        },
-      })
-      .populate({
-        path: "to",
-        select: "userId",
-        populate: {
-          path: "userId",
-          model: "User",
-          select: "firstName lastName email mobile",
-        },
-      })
-      .sort({ createdAt: -1 });
+    const transactions = await getUserTransactionsQuery(accountId);
 
     return res.status(200).json({
       success: true,
@@ -172,17 +177,18 @@ export const fetchTxn = async (req, res) => {
       return res.status(400).json({ message: "Transaction not found" });
     }
     const txn = await Transaction.findById(txnId)
-    .populate({
-      path: "from",
-      populate: {
-        path:'userId'
-      },
-    }).populate({
-      path:'to',
-      populate:{
-        path:'userId'
-      }
-    });
+      .populate({
+        path: "from",
+        populate: {
+          path: "userId",
+        },
+      })
+      .populate({
+        path: "to",
+        populate: {
+          path: "userId",
+        },
+      });
     if (!txn) {
       return res.status(404).json({
         message: "Transaction not found invalid txn",
@@ -198,5 +204,44 @@ export const fetchTxn = async (req, res) => {
     return res
       .status(500)
       .json({ success: false, message: "Something went wrong" });
+  }
+};
+
+//paginated transaccion
+export const paginatedTransaction = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+    const account = await Account.findOne({ userId: req.user.userId }).select(
+      "_id"
+    );
+    if (!account)
+      return res
+        .status(404)
+        .json({ success: false, message: "Account not found" });
+    const total = await Transaction.countDocuments({
+      $or: [{ from: account._id }, { to: account._id }],
+    });
+
+    const transactions = await getUserTransactionsQuery(account._id, {
+      skip,
+      limit,
+    });
+
+    return res.status(200).json({
+      success: true,
+      transactions,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+      totalTransactions: total,
+    });
+  } catch (error) {
+
+     return res.status(500).json({
+      success: false,
+      message: "Pagination failed",
+      error: error.message,
+    });
   }
 };

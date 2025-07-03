@@ -22,5 +22,6 @@ export const generateToken = (
             success: true,
             message,
             token,
+            user
         });
 };

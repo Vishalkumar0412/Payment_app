@@ -11,6 +11,7 @@ import TransactionDetails from "@/components/TransactionDetails";
 import SendMoney from "@/components/SendMoey";
 import TransactionReceipt from "@/components/TransactionReciept";
 import { AuthonticatedUser, ProtectedRoute } from "./ProtectedRoute";
+import Profile from "@/pages/Profile";
 
 const appRouter = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ const appRouter = createBrowserRouter([
       {
         path:'transfer',
         element:(<ProtectedRoute><Users/></ProtectedRoute>)
+      },
+      {
+        path:'profile',
+        element:(<ProtectedRoute><Profile/></ProtectedRoute>)
       },
       {
         path:'send-money/:id',

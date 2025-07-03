@@ -33,6 +33,13 @@ export const transactionApi = createApi({
                 method:"GET",
 
             })
+        }),
+        getPaginatedTxns: builder.query({
+            query:({page,limit=5})=>({
+                url:`paginated?page=${page}&limit=${limit}`,
+                method:"GET"
+            })
+
         })
       
        
@@ -42,7 +49,7 @@ export const {
  
     useFetchTxnQuery,
     useSendMoneyMutation,
-    useGetHistoryQuery
+    useGetHistoryQuery,useGetPaginatedTxnsQuery
 
 
 }=transactionApi;

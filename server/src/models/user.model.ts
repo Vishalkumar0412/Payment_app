@@ -11,7 +11,8 @@ interface IUser extends mongoose.Document {
     role: 'user' | 'admin';
     transactions?: mongoose.Types.ObjectId[];
     account?:mongoose.Types.ObjectId;
-    mobile?: string;
+    mobile: string;
+    profileUrl?:string
  
 }
 const UserSchema  = new mongoose.Schema <IUser>({
@@ -57,6 +58,9 @@ const UserSchema  = new mongoose.Schema <IUser>({
         type:String,
         unique:true,
         required:true
+    },
+    profileUrl:{
+        typr:String,
     }
    
     

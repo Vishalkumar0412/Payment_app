@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { motion } from "framer-motion";
-import { ArrowRightLeft, BookUserIcon, LogIn, LogOut, Send, SquareUserRound, User } from "lucide-react";
+import { ArrowRightLeft, BookUserIcon, LogIn, LogOut, Send, SquareUserRound, User, User2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Link, useNavigate } from "react-router";
 import { useSelector } from "react-redux";
@@ -72,6 +72,9 @@ const Navbar = () => {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuItem>{user.firstName} {user.lastName}</DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <Link to='/profile' >  
+                <DropdownMenuItem><User2 /> Profile</DropdownMenuItem>
+                 </Link>  
                 <Link to='/account' >  
                 <DropdownMenuItem><BookUserIcon /> Account</DropdownMenuItem>
                  </Link>  

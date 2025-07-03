@@ -230,3 +230,8 @@ export const getUserByAccount=async(req,res)=>{
   return res.status(200).json({user});
 
 }
+
+//update profile
+export const updateProfile =async(req,res)=>{
+
+}
